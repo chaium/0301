@@ -1,10 +1,10 @@
 import React from 'react';
-import LANCET1cfm from './LANCET1cfm';
+import LANCET4cfm from './LANCET4cfm';
 
-function LANCET1cfmApp(props) {
+function LANCET4cfmApp(props) {
   return (
     <div className="App">
-      <LANCET1cfm selectedSubcategory={props.selectedSubcategory} 
+      <LANCET4cfm selectedSubcategory={props.selectedSubcategory} 
                  floorArea={props.floorArea} 
                  height={props.height} 
                  occupantNumber={props.occupantNumber} 
@@ -175,4 +175,4 @@ percentile={props.percentile}  />
   );
 }
 
-export default LANCET1cfmApp;
+export default LANCET4cfmApp;

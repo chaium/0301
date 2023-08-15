@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import './FancyButton4.css';
 import * as simpleStats from 'simple-statistics';
 
-const LANCET1cfm = ({ selectedSubcategory, floorArea, 
+const LANCET4cfm = ({ selectedSubcategory, floorArea, 
   height, occupantNumber, occupiedPeriod, expiratoryActivity, physicalActivity,
   virusType, immunityProportion, infectorStatus, casesPerDay, infectiousPeriod, unreportedCases, infectorNumber,
   supplyAir, outdoorAir, merv, filter, hvacUV, hvacTreatment,
@@ -579,6 +579,7 @@ for (let i = 0; i < simulations; i++) {
 return quickSelect(br_ps, Math.floor(percentile));
 }
 
+
   const totalCADRR = outdoorAir + 
     (supplyAir - outdoorAir) * filter + 
     (supplyAir - outdoorAir) * (1 - filter) * hvacUV / 100 +
@@ -587,7 +588,7 @@ return quickSelect(br_ps, Math.floor(percentile));
     roomAC * roomACQ + 
     roomTreatment * roomTreatmentQ;
 
-    const standard = ASHRAE
+  const standard = ASHRAE
     
   const isCompliant = totalCADRR >= standard;
 
@@ -610,14 +611,14 @@ return quickSelect(br_ps, Math.floor(percentile));
         (supplyAir - xValue) * (1 - yValue / 100) * hvacUV / 100 +
         hvacTreatment +
         roomUV * roomUVQ + 
-    roomAC * roomACQ + 
-    roomTreatment * roomTreatmentQ ;
+        roomAC * roomACQ + 
+        roomTreatment * roomTreatmentQ ;
 
       return baseNADR;
     })
   );
 
-     const IR = () => {
+  const IR = () => {
     const nadrValue = nadr().sort((a, b) => a - b)[Math.floor(percentile * 10)];
     const emissionValue = emission().sort((a, b) => a - b)[Math.floor(percentile * 10 )];
     const br_pValue = br_p();
@@ -686,7 +687,7 @@ hvacTreatment +
 roomUV * roomUVQ + 
 roomAC * roomACQ + 
 roomTreatment * roomTreatmentQ;
-        
+
 const [hoveredNADR, setHoveredNADR] = useState(defaultNADR.toFixed(1));
 const [hoveredOA, setHoveredOA] = useState(defaultOA.toFixed(1));
 const [hoveredFilter, setHoveredFilter] = useState(defaultFilter);
@@ -752,24 +753,25 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
       const svg = d3.select(d3Container.current).append('svg').attr('width', 550).attr('height', 550);
 
       const maxValue = Math.max(...data2().flat());
+      const nadrValue = nadr().sort((a, b) => a - b)[Math.floor(percentile * 10)];
+      const emissionValue = emission().sort((a, b) => a - b)[Math.floor(percentile * 10)];
+      const br_pValue = br_p();
+      const final_susValue = final_sus();
 
-      const LANCET_ach = totalCADRR/(floorArea * height) * 60;
+      const newF1 = final_susValue * emissionValue * br_pValue * 0.58857777021102 * occupiedPeriod / 60 * (1 - maskInfector / 100) * (1 - maskSus / 100);
+      const newF2 = final_susValue * emissionValue * br_pValue * 0.58857777021102 * occupiedPeriod / 60 * (1 - maskInfector / 100) * (1 - maskSus / 100);
 
 
       const colorFunction = (x, y) => {
-        const baseValue = data2()[y][x] / (floorArea * height) * 60;
+        const baseValue = data2()[y][x];
     
         const greyColor = '#C8C8C8';
-    
-        const scale = d3.scaleLinear().domain([thresholdValue, maxValue]).range([0.3, 1]);
-        const color = d3.interpolateBlues(scale(baseValue));
-        
 
-        if (baseValue < 4) {
+        if (baseValue < newF1) {
           if (x == (Math.round(outdoorAirValue / max)) &&
           y == (Math.round(filterValue * 100 / 5))) {
 
-            if (LANCET_ach >= 4) {
+            if (totalCADRR >= newF1) {
               return 'rgba(255, 215, 0, 0.7)'
             }
             else {
@@ -781,10 +783,10 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
           return greyColor;         
         }
 
-        } else if (baseValue >= 4 && baseValue < 6) {
+        } else if (baseValue >= newF1 && baseValue < newF2) {
             if (x == (Math.round(outdoorAirValue / max)) &&
             y == (Math.round(filterValue * 100 / 5))) {
-              if (LANCET_ach >= 4) {
+              if (totalCADRR >= newF1) {
 
                 return '#006400'
               }
@@ -797,10 +799,10 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
           
           return 'rgba(100, 150, 190)';         
         }
-        } else if (baseValue == 6) {
+        } else if (baseValue == newF2) {
           if (x == (Math.round(outdoorAirValue / max)) &&
           y == (Math.round(filterValue * 100 / 5))) {
-            if (LANCET_ach >= 4) {
+            if (totalCADRR >= newF2) {
 
               return '#006400'
             }
@@ -813,10 +815,10 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
         
         return 'rgba(60, 115, 175)';         
       }
-      } else if (baseValue > 6) {
+      } else if (baseValue > newF2) {
         if (x == (Math.round(outdoorAirValue / max)) &&
         y == (Math.round(filterValue * 100 / 5))) {
-          if (LANCET_ach >= 4) {
+          if (totalCADRR >= newF1) {
 
             return '#006400'
           }
@@ -986,7 +988,7 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
           fontSize: '0.9rem',
         }}
       >
-        Total CADR {hoveredNADR} cfm&emsp;Individual Risk: {hoveredIR}%&emsp;Absolute Risk: {hoveredAR}%<br/> OA: {hoveredOA} cfm&emsp;RA: {supplyAir-hoveredOA} cfm ({((supplyAir - hoveredOA) / supplyAir * 100).toFixed(1)}%)&emsp;Filter: {hoveredFilter}%
+                Total CADR {hoveredNADR} cfm&emsp;Individual Risk: {hoveredIR}%&emsp;Absolute Risk: {hoveredAR}%<br/> OA: {hoveredOA} cfm&emsp;RA: {supplyAir-hoveredOA} cfm ({((supplyAir - hoveredOA) / supplyAir * 100).toFixed(1)}%)&emsp;Filter: {hoveredFilter}%
         </span>
         <br/>
         
@@ -1053,4 +1055,4 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
 );
 };
 
-export default LANCET1cfm;
+export default LANCET4cfm;

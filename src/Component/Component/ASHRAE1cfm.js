@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import './FancyButton4.css';
 
-const ASHRAE2cfm = ({ selectedSubcategory, floorArea, 
+const ASHRAE1cfm = ({ selectedSubcategory, floorArea, 
   height, occupantNumber, occupiedPeriod, expiratoryActivity, physicalActivity,
   virusType, immunityProportion, infectorStatus, casesPerDay, infectiousPeriod, unreportedCases, infectorNumber,
   supplyAir, outdoorAir, merv, filter, hvacUV, hvacTreatment,
@@ -37,7 +37,7 @@ const ASHRAE2cfm = ({ selectedSubcategory, floorArea,
     roomAC * roomACQ + 
     roomTreatment * roomTreatmentQ;
 
-    const standard = ASHRAE
+  const standard = ASHRAE
     
   const isCompliant = totalCADRR >= standard;
 
@@ -244,7 +244,7 @@ const ASHRAE2cfm = ({ selectedSubcategory, floorArea,
         .style('font-family', 'Arial') // Set font family to Arial
         .style('font-size', '0.9rem') // Set font size to 0.9rem
         .attr('transform', 'rotate(-90)')
-        .text('Return Air (%)');
+        .text('Filter Efficiency (%)');
 
         svg
         .selectAll('.cell')
@@ -393,4 +393,4 @@ const ASHRAE2cfm = ({ selectedSubcategory, floorArea,
 );
 };
 
-export default ASHRAE2cfm;
+export default ASHRAE1cfm;

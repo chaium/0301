@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import './FancyButton4.css';
 
-const ASHRAE2cfm = ({ selectedSubcategory, floorArea, 
+const LANCET3cfm = ({ selectedSubcategory, floorArea, 
   height, occupantNumber, occupiedPeriod, expiratoryActivity, physicalActivity,
   virusType, immunityProportion, infectorStatus, casesPerDay, infectiousPeriod, unreportedCases, infectorNumber,
   supplyAir, outdoorAir, merv, filter, hvacUV, hvacTreatment,
-  roomTreatment, roomUV, roomAC, roomTreatmentQ, roomUVQ, roomACQ, maskInfector, maskSus, ASHRAE, ASHRAE2}) => {
+  roomTreatment, roomUV, roomAC, roomTreatmentQ, roomUVQ, roomACQ, maskInfector, maskSus, ASHRAE, ASHRAE2, ASHRAE62ft, ASHRAE62p}) => {
 
-    const [showControl, setShowControl] = useState(false);
+ const [showControl, setShowControl] = useState(false);
  const d3Container = useRef(null);
 
  const [ac, setAc] = useState(false);
@@ -140,7 +140,9 @@ const ASHRAE2cfm = ({ selectedSubcategory, floorArea,
       maskInfector,
       maskSus,
       ASHRAE,
-      ASHRAE2
+      ASHRAE2,
+      ASHRAE62ft,
+      ASHRAE62p
     );
     
     if (d3Container.current) {
@@ -149,20 +151,20 @@ const ASHRAE2cfm = ({ selectedSubcategory, floorArea,
 
       const maxValue = Math.max(...data2().flat());
 
+      const newF1 = floorArea * (ASHRAE62ft + 0.75) + occupantNumber * ASHRAE62p;
+      const newF2 = floorArea * (ASHRAE62ft + 1) + occupantNumber * ASHRAE62p;
+
+
       const colorFunction = (x, y) => {
         const baseValue = data2()[y][x];
     
-        const greyColor = '#808080';
-    
-        const scale = d3.scaleLinear().domain([thresholdValue, maxValue]).range([0.3, 1]);
-        const color = d3.interpolateBlues(scale(baseValue));
-        
+        const greyColor = '#C8C8C8';
 
-        if (baseValue < thresholdValue) {
+        if (baseValue < newF1) {
           if (x == (Math.round(outdoorAirValue / max)) &&
           y == (Math.round(filterValue * 100 / 5))) {
 
-            if (totalCADRR >= thresholdValue) {
+            if (totalCADRR >= newF1) {
               return 'rgba(255, 215, 0, 0.7)'
             }
             else {
@@ -174,21 +176,55 @@ const ASHRAE2cfm = ({ selectedSubcategory, floorArea,
           return greyColor;         
         }
 
-        } else {
+        } else if (baseValue >= newF1 && baseValue < newF2) {
             if (x == (Math.round(outdoorAirValue / max)) &&
             y == (Math.round(filterValue * 100 / 5))) {
-              if (totalCADRR >= thresholdValue) {
+              if (totalCADRR >= newF1) {
 
-                return 'green'
+                return '#006400'
               }
               else {
             return 'rgba(255, 215, 0, 0.7)'
               };
 
         } else {
-          return color;         
+
+          
+          return 'rgba(100, 150, 190)';         
         }
-        }
+        } else if (baseValue == newF2) {
+          if (x == (Math.round(outdoorAirValue / max)) &&
+          y == (Math.round(filterValue * 100 / 5))) {
+            if (totalCADRR >= newF2) {
+
+              return '#006400'
+            }
+            else {
+          return 'rgba(255, 215, 0, 0.7)'
+            };
+
+      } else {
+
+        
+        return 'rgba(60, 115, 175)';         
+      }
+      } else if (baseValue > newF2) {
+        if (x == (Math.round(outdoorAirValue / max)) &&
+        y == (Math.round(filterValue * 100 / 5))) {
+          if (totalCADRR >= newF1) {
+
+            return '#006400'
+          }
+          else {
+        return 'rgba(255, 215, 0, 0.7)'
+          };
+
+    } else {
+
+      
+      return 'rgba(60, 115, 175)';         
+    }
+    }
     };
 
 
@@ -244,7 +280,7 @@ const ASHRAE2cfm = ({ selectedSubcategory, floorArea,
         .style('font-family', 'Arial') // Set font family to Arial
         .style('font-size', '0.9rem') // Set font size to 0.9rem
         .attr('transform', 'rotate(-90)')
-        .text('Return Air (%)');
+        .text('Filter Efficiency (%)');
 
         svg
         .selectAll('.cell')
@@ -299,7 +335,7 @@ const ASHRAE2cfm = ({ selectedSubcategory, floorArea,
     height, occupantNumber, occupiedPeriod, expiratoryActivity, physicalActivity,
     virusType, immunityProportion, infectorStatus, casesPerDay, infectiousPeriod, unreportedCases, infectorNumber,
     supplyAir, outdoorAir, merv, filter, hvacUV, hvacTreatment,
-    roomTreatment, roomUV, roomAC, roomTreatmentQ, roomUVQ, roomACQ, maskInfector, maskSus, ASHRAE, ASHRAE2 ]);
+    roomTreatment, roomUV, roomAC, roomTreatmentQ, roomUVQ, roomACQ, maskInfector, maskSus, ASHRAE, ASHRAE2, ASHRAE62ft, ASHRAE62p ]);
 
   return (
 
@@ -326,7 +362,7 @@ const ASHRAE2cfm = ({ selectedSubcategory, floorArea,
           fontSize: '0.9rem',
         }}
       >
-        Total CADR {hoveredNADR} cfm&emsp;Absolute Risk: {hoveredAR}%&emsp;Relative Risk: {hoveredRR}<br/> OA: {hoveredOA} cfm&emsp;RA: {supplyAir-hoveredOA} cfm ({((supplyAir - hoveredOA) / supplyAir * 100).toFixed(1)}%)&emsp;Filter: {hoveredFilter}%
+        Total NADR {hoveredNADR} cfm&emsp;Absolute Risk: {hoveredAR}%&emsp;Relative Risk: {hoveredRR}<br/> OA: {hoveredOA} cfm&emsp;RA: {supplyAir-hoveredOA} cfm ({((supplyAir - hoveredOA) / supplyAir * 100).toFixed(1)}%)&emsp;Filter: {hoveredFilter}%
         </span>
         <br/>
         
@@ -393,4 +429,4 @@ const ASHRAE2cfm = ({ selectedSubcategory, floorArea,
 );
 };
 
-export default ASHRAE2cfm;
+export default LANCET3cfm;

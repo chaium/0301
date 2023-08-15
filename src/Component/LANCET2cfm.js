@@ -3,30 +3,30 @@ import * as d3 from 'd3';
 import './FancyButton4.css';
 import * as simpleStats from 'simple-statistics';
 
-const LANCET1cfm = ({ selectedSubcategory, floorArea, 
+const LANCET2cfm = ({ selectedSubcategory, floorArea, 
   height, occupantNumber, occupiedPeriod, expiratoryActivity, physicalActivity,
   virusType, immunityProportion, infectorStatus, casesPerDay, infectiousPeriod, unreportedCases, infectorNumber,
   supplyAir, outdoorAir, merv, filter, hvacUV, hvacTreatment,
   roomTreatment, roomUV, roomAC, roomTreatmentQ, roomUVQ, roomACQ, maskInfector, maskSus, ASHRAE, ASHRAE2,
   typeCi, CiBmin, CiBmax, Cialpha, Cibeta, Cimin, Cimax,
-    typeCv, CVmu, CVsigma, CVmin, CVmax,
-    type111, type222, type333, type444, type555, 
-    resting, standing, light, moderate, heavy, 
-    BR1mu, BR1sigma, BR1min, BR1max, BR2mu, BR2sigma, BR2min, BR2max, 
-    BR3mu, BR3sigma, BR3min, BR3max, BR4mu, BR4sigma, BR4min, BR4max,  
-    BR5mu, BR5sigma, BR5min, BR5max,
-    ACM, type1, type2, type3, type4, type5, type6, 
-    breathing, whispered, voiced, coughing, whispering, speaking, 
-    EA1mu, EA1sigma, EA1min, EA1max, DD1mu, DD1sigma, DD1min, DD1max,
-    EA2mu, EA2sigma, EA2min, EA2max, DD2mu, DD2sigma, DD2min, DD2max,
-    EA3mu, EA3sigma, EA3min, EA3max, DD3mu, DD3sigma, DD3min, DD3max,
-    EA4mu, EA4sigma, EA4min, EA4max, DD4mu, DD4sigma, DD4min, DD4max,
-    EA5mu, EA5sigma, EA5min, EA5max, DD5mu, DD5sigma, DD5min, DD5max,
-    EA6mu, EA6sigma, EA6min, EA6max, DD6mu, DD6sigma, DD6min, DD6max,
-    EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
-    EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
-    EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4,
-    typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma, percentile}) => {
+  typeCv, CVmu, CVsigma, CVmin, CVmax,
+  type111, type222, type333, type444, type555, 
+  resting, standing, light, moderate, heavy, 
+  BR1mu, BR1sigma, BR1min, BR1max, BR2mu, BR2sigma, BR2min, BR2max, 
+  BR3mu, BR3sigma, BR3min, BR3max, BR4mu, BR4sigma, BR4min, BR4max,  
+  BR5mu, BR5sigma, BR5min, BR5max,
+  ACM, type1, type2, type3, type4, type5, type6, 
+  breathing, whispered, voiced, coughing, whispering, speaking, 
+  EA1mu, EA1sigma, EA1min, EA1max, DD1mu, DD1sigma, DD1min, DD1max,
+  EA2mu, EA2sigma, EA2min, EA2max, DD2mu, DD2sigma, DD2min, DD2max,
+  EA3mu, EA3sigma, EA3min, EA3max, DD3mu, DD3sigma, DD3min, DD3max,
+  EA4mu, EA4sigma, EA4min, EA4max, DD4mu, DD4sigma, DD4min, DD4max,
+  EA5mu, EA5sigma, EA5min, EA5max, DD5mu, DD5sigma, DD5min, DD5max,
+  EA6mu, EA6sigma, EA6min, EA6max, DD6mu, DD6sigma, DD6min, DD6max,
+  EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
+  EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
+  EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4,
+  typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma, percentile}) => {
 
  const [showControl, setShowControl] = useState(false);
  const d3Container = useRef(null);
@@ -753,11 +753,11 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
 
       const maxValue = Math.max(...data2().flat());
 
-      const LANCET_ach = totalCADRR/(floorArea * height) * 60;
+      const LANCET_occ = totalCADRR/occupantNumber;
 
 
       const colorFunction = (x, y) => {
-        const baseValue = data2()[y][x] / (floorArea * height) * 60;
+        const baseValue = data2()[y][x] / occupantNumber;
     
         const greyColor = '#C8C8C8';
     
@@ -765,11 +765,11 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
         const color = d3.interpolateBlues(scale(baseValue));
         
 
-        if (baseValue < 4) {
+        if (baseValue < 21) {
           if (x == (Math.round(outdoorAirValue / max)) &&
           y == (Math.round(filterValue * 100 / 5))) {
 
-            if (LANCET_ach >= 4) {
+            if (LANCET_occ >= 21) {
               return 'rgba(255, 215, 0, 0.7)'
             }
             else {
@@ -781,10 +781,10 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
           return greyColor;         
         }
 
-        } else if (baseValue >= 4 && baseValue < 6) {
+        } else if (baseValue >= 21 && baseValue < 30) {
             if (x == (Math.round(outdoorAirValue / max)) &&
             y == (Math.round(filterValue * 100 / 5))) {
-              if (LANCET_ach >= 4) {
+              if (LANCET_occ >= 21) {
 
                 return '#006400'
               }
@@ -797,10 +797,10 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
           
           return 'rgba(100, 150, 190)';         
         }
-        } else if (baseValue == 6) {
+        } else if (baseValue == 30) {
           if (x == (Math.round(outdoorAirValue / max)) &&
           y == (Math.round(filterValue * 100 / 5))) {
-            if (LANCET_ach >= 4) {
+            if (LANCET_occ >= 21) {
 
               return '#006400'
             }
@@ -813,10 +813,10 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
         
         return 'rgba(60, 115, 175)';         
       }
-      } else if (baseValue > 6) {
+      } else if (baseValue > 30) {
         if (x == (Math.round(outdoorAirValue / max)) &&
         y == (Math.round(filterValue * 100 / 5))) {
-          if (LANCET_ach >= 4) {
+          if (LANCET_occ >= 21) {
 
             return '#006400'
           }
@@ -921,6 +921,7 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
           tooltip.style('opacity', 0);  
         });
 
+
         const tooltip = d3
         .select(d3Container.current)
         .append('div')
@@ -986,7 +987,7 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
           fontSize: '0.9rem',
         }}
       >
-        Total CADR {hoveredNADR} cfm&emsp;Individual Risk: {hoveredIR}%&emsp;Absolute Risk: {hoveredAR}%<br/> OA: {hoveredOA} cfm&emsp;RA: {supplyAir-hoveredOA} cfm ({((supplyAir - hoveredOA) / supplyAir * 100).toFixed(1)}%)&emsp;Filter: {hoveredFilter}%
+         Total CADR {hoveredNADR} cfm&emsp;Individual Risk: {hoveredIR}%&emsp;Absolute Risk: {hoveredAR}%<br/> OA: {hoveredOA} cfm&emsp;RA: {supplyAir-hoveredOA} cfm ({((supplyAir - hoveredOA) / supplyAir * 100).toFixed(1)}%)&emsp;Filter: {hoveredFilter}%
         </span>
         <br/>
         
@@ -1053,4 +1054,4 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
 );
 };
 
-export default LANCET1cfm;
+export default LANCET2cfm;

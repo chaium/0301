@@ -1,10 +1,10 @@
 import React from 'react';
-import LANCET1cfm from './LANCET1cfm';
+import LANCET3cfm from './LANCET3cfm';
 
-function LANCET1cfmApp(props) {
+function LANCET3cfmApp(props) {
   return (
     <div className="App">
-      <LANCET1cfm selectedSubcategory={props.selectedSubcategory} 
+      <LANCET3cfm selectedSubcategory={props.selectedSubcategory} 
                  floorArea={props.floorArea} 
                  height={props.height} 
                  occupantNumber={props.occupantNumber} 
@@ -34,6 +34,8 @@ function LANCET1cfmApp(props) {
                  maskSus={props.maskSus}
                  ASHRAE={props.ASHRAE}
                  ASHRAE2={props.ASHRAE2}
+                 ASHRAE62ft={props.ASHRAE62ft}
+                 ASHRAE62p={props.ASHRAE62p}
                  typeCi={props.typeCi}
 CiBmin={props.CiBmin}
 CiBmax={props.CiBmax}
@@ -175,4 +177,4 @@ percentile={props.percentile}  />
   );
 }
 
-export default LANCET1cfmApp;
+export default LANCET3cfmApp;

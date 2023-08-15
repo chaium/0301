@@ -29,11 +29,14 @@ function App() {
     <div>
       <Navbar />
       <Hero saveForComparison={saveForComparison} />
-      <Compare comparisonData={comparisonData} setComparisonData={setComparisonData} />
+
       {/*
+      <Compare comparisonData={comparisonData} setComparisonData={setComparisonData} />
+     
       <Testimonials />
-      */}
-      <Demo />
+      
+      <Demo />*/}
+      
       <Footer />
       {modalIsOpen && (
         <div className="modal">
