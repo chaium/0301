@@ -416,8 +416,18 @@ function partition(nums, left, right, pivotIndex) {
   return storeIndex;
 }
 
+const createCachedFunction = (fn) => {
+  let cached;
+  return () => {
+      if (cached === undefined) {
+          cached = fn();
+      }
+      return cached;
+  };
+};
 
-const nadr = () => {
+
+const nadr = createCachedFunction(() => {
   let naturals = [];
   const simulations = 1000;
 
@@ -427,9 +437,9 @@ const nadr = () => {
   }
 
   return naturals; // Return the array of simulations directly.
-};
+});
 
-const emission = () => {
+const emission = createCachedFunction(() => {
 let emissions = [];
 
 const simulations = 1000;
@@ -491,10 +501,10 @@ for (let i = 0; i < simulations; i++) {
 }
 
 return emissions;
-}
+})
 
 
-const final_sus = () => {
+const final_sus = createCachedFunction(() => {
 let results = [];
 
 const simulations = 1000;
@@ -555,9 +565,9 @@ for (let i = 0; i < simulations; i++) {
 }
 
 return quickSelect(results, Math.floor(percentile));
-}
+})
 
-const br_p = () => {
+const br_p = createCachedFunction(() => {
 let br_ps = [];
 
 const simulations = 1000;
@@ -577,7 +587,7 @@ for (let i = 0; i < simulations; i++) {
 }
 
 return quickSelect(br_ps, Math.floor(percentile));
-}
+})
 
   const totalCADRR = outdoorAir + 
     (supplyAir - outdoorAir) * filter + 
@@ -987,7 +997,7 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
           fontSize: '0.9rem',
         }}
       >
-         Total CADR {hoveredNADR} cfm&emsp;Individual Risk: {hoveredIR}%&emsp;Absolute Risk: {hoveredAR}%<br/> OA: {hoveredOA} cfm&emsp;RA: {supplyAir-hoveredOA} cfm ({((supplyAir - hoveredOA) / supplyAir * 100).toFixed(1)}%)&emsp;Filter: {hoveredFilter}%
+         Total NADR {hoveredNADR} cfm&emsp;Individual Risk: {hoveredIR}%&emsp;Absolute Risk: {hoveredAR}%<br/> OA: {hoveredOA} cfm&emsp;RA: {supplyAir-hoveredOA} cfm ({((supplyAir - hoveredOA) / supplyAir * 100).toFixed(1)}%)&emsp;Filter: {hoveredFilter}%
         </span>
         <br/>
         

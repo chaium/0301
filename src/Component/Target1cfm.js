@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import './FancyButton4.css';
 import * as simpleStats from 'simple-statistics';
 
-const LANCET1cfm = ({ selectedSubcategory, floorArea, 
+const Target1cfm = ({ selectedSubcategory, floorArea, 
   height, occupantNumber, occupiedPeriod, expiratoryActivity, physicalActivity,
   virusType, immunityProportion, infectorStatus, casesPerDay, infectiousPeriod, unreportedCases, infectorNumber,
   supplyAir, outdoorAir, merv, filter, hvacUV, hvacTreatment,
@@ -26,7 +26,8 @@ const LANCET1cfm = ({ selectedSubcategory, floorArea,
     EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
     EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
     EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4,
-    typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma, percentile}) => {
+    typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma, percentile,
+    target, target2, target3, target4, target5, target6, target7, target8, targetType}) => {
 
  const [showControl, setShowControl] = useState(false);
  const d3Container = useRef(null);
@@ -589,6 +590,170 @@ for (let i = 0; i < simulations; i++) {
 return quickSelect(br_ps, Math.floor(percentile));
 })
 
+const infector = createCachedFunction(() => {
+    let results = [];
+    
+    const simulations = 1000;
+    
+    for (let i = 0; i < simulations; i++) {
+      
+        let Ci, Cv, BR, Vd; // Declare the variables
+    
+        Ci = Ci_calculation(typeCi,  CiBmin, CiBmax, Cialpha, Cibeta, Cimin, Cimax);
+        Cv = Cv_calculation(typeCv, CVmu, CVsigma, CVmin, CVmax);
+        BR = BR_calculation(type111, type222, type333, type444, type555,  
+            resting, standing, light, moderate, heavy, 
+            BR1mu, BR1sigma, BR1min, BR1max, BR2mu, BR2sigma, BR2min, BR2max, 
+            BR3mu, BR3sigma, BR3min, BR3max, BR4mu, BR4sigma, BR4min, BR4max,  
+            BR5mu, BR5sigma, BR5min, BR5max);
+        Vd = Vd_calculation(ACM, type1, type2, type3, type4, type5, type6, 
+          breathing, whispered, voiced, coughing, whispering, speaking, 
+           EA1mu, EA1sigma, EA1min, EA1max, DD1mu, DD1sigma, DD1min, DD1max,
+           EA2mu, EA2sigma, EA2min, EA2max, DD2mu, DD2sigma, DD2min, DD2max,
+           EA3mu, EA3sigma, EA3min, EA3max, DD3mu, DD3sigma, DD3min, DD3max,
+           EA4mu, EA4sigma, EA4min, EA4max, DD4mu, DD4sigma, DD4min, DD4max,
+           EA5mu, EA5sigma, EA5min, EA5max, DD5mu, DD5sigma, DD5min, DD5max,
+           EA6mu, EA6sigma, EA6min, EA6max, DD6mu, DD6sigma, DD6min, DD6max,
+           EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
+           EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
+           EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4
+           );
+    
+        let Infector = 0;
+    
+        if (infectorStatus === "Number of Infector") {
+            Infector = Number(infectorNumber);
+        } else {
+            for (let occ = 0; occ < occupantNumber; occ++) {
+                const randomValue = Math.random();
+                const threshold = (infectiousPeriod * casesPerDay / 100000) / (1 - unreportedCases / 100);
+      
+                if (randomValue < threshold) {
+                    Infector++;
+                }
+            }
+        }
+    
+    
+          // Store Infector and Final_Susceptible in the results array
+          results.push(Infector);
+    }
+    
+    return quickSelect(results, Math.floor(percentile));
+    })
+
+
+function risk_Calculation(typeCi, CiBmin, CiBmax, Cialpha, Cibeta, Cimin, Cimax,
+    typeCv, CVmu, CVsigma, CVmin, CVmax,
+    type111, type222, type333, type444, type555, 
+    resting, standing, light, moderate, heavy, 
+    BR1mu, BR1sigma, BR1min, BR1max, BR2mu, BR2sigma, BR2min, BR2max, 
+    BR3mu, BR3sigma, BR3min, BR3max, BR4mu, BR4sigma, BR4min, BR4max,  
+    BR5mu, BR5sigma, BR5min, BR5max,
+    ACM, type1, type2, type3, type4, type5, type6, 
+    breathing, whispered, voiced, coughing, whispering, speaking, 
+    EA1mu, EA1sigma, EA1min, EA1max, DD1mu, DD1sigma, DD1min, DD1max,
+    EA2mu, EA2sigma, EA2min, EA2max, DD2mu, DD2sigma, DD2min, DD2max,
+    EA3mu, EA3sigma, EA3min, EA3max, DD3mu, DD3sigma, DD3min, DD3max,
+    EA4mu, EA4sigma, EA4min, EA4max, DD4mu, DD4sigma, DD4min, DD4max,
+    EA5mu, EA5sigma, EA5min, EA5max, DD5mu, DD5sigma, DD5min, DD5max,
+    EA6mu, EA6sigma, EA6min, EA6max, DD6mu, DD6sigma, DD6min, DD6max,
+    EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
+    EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
+    EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4,
+    maskInfector, maskSus,
+    infectorStatus, infectorNumber, occupantNumber, casesPerDay, infectiousPeriod, unreportedCases,
+    floorArea, height, occupiedPeriod, immunityProportion,
+    outdoorAir, supplyAir, filter, hvacUV, hvacTreatment, roomUV, roomUVQ, roomAC, roomACQ, roomTreatment, roomTreatmentQ,
+    typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma
+  ) {
+  
+    const simulations = 10000;
+    const volume = floorArea * height * 0.02831685;
+  
+    const results = {
+      IR: [],
+      AR: [],
+      Estimated: [],
+      Reproduction: []
+    };
+  
+    for (let i = 0; i < simulations; i++) {
+  
+      let IVRR, Ci, Cv, BR, Vd; // Declare the variables
+  
+      IVRR = (outdoorAir + 
+        (supplyAir - outdoorAir) * filter + 
+        (supplyAir - outdoorAir) * (1 - filter) * hvacUV / 100 +
+        hvacTreatment +
+        roomUV * roomUVQ +  roomAC * roomACQ +  roomTreatment * roomTreatmentQ) * 1.69901082 / volume +
+        natural_calculation(typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma);
+  
+  
+      Ci = Ci_calculation(typeCi,  CiBmin, CiBmax, Cialpha, Cibeta, Cimin, Cimax)
+      Cv = Cv_calculation(typeCv, CVmu, CVsigma, CVmin, CVmax)
+      BR = BR_calculation(type111, type222, type333, type444, type555,  
+        resting, standing, light, moderate, heavy, 
+        BR1mu, BR1sigma, BR1min, BR1max, BR2mu, BR2sigma, BR2min, BR2max, 
+        BR3mu, BR3sigma, BR3min, BR3max, BR4mu, BR4sigma, BR4min, BR4max,  
+        BR5mu, BR5sigma, BR5min, BR5max)
+      Vd = Vd_calculation(ACM, type1, type2, type3, type4, type5, type6,  
+        breathing, whispered, voiced, coughing, whispering, speaking, 
+         EA1mu, EA1sigma, EA1min, EA1max, DD1mu, DD1sigma, DD1min, DD1max,
+         EA2mu, EA2sigma, EA2min, EA2max, DD2mu, DD2sigma, DD2min, DD2max,
+         EA3mu, EA3sigma, EA3min, EA3max, DD3mu, DD3sigma, DD3min, DD3max,
+         EA4mu, EA4sigma, EA4min, EA4max, DD4mu, DD4sigma, DD4min, DD4max,
+         EA5mu, EA5sigma, EA5min, EA5max, DD5mu, DD5sigma, DD5min, DD5max,
+         EA6mu, EA6sigma, EA6min, EA6max, DD6mu, DD6sigma, DD6min, DD6max,
+         EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
+         EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
+         EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4)
+  
+         let Infector = 0;
+  
+         if (infectorStatus === "Number of Infector") {
+             Infector = Number(infectorNumber);
+         } else {
+             for (let occ = 0; occ < occupantNumber; occ++) {
+                 const randomValue = Math.random();
+                 const threshold = (infectiousPeriod * casesPerDay / 100000) / (1 - unreportedCases / 100);
+  
+                 if (randomValue < threshold) {
+                     Infector++;
+                 }
+             }
+         }
+  
+        let Susceptible = occupantNumber - Infector;
+        let Final_Susceptible = 0;
+  
+          for (let sus = 0; sus < Susceptible; sus++) {
+              const randomValue2 = Math.random();
+              const threshold2 = immunityProportion / 100;
+  
+              if (randomValue2 > threshold2) {
+                Final_Susceptible++;
+              }
+          }
+   
+        const Total_Emission = Ci * Cv * BR * Vd * (1 - maskInfector / 100) * Infector
+        const IntQuanta = Total_Emission / (IVRR * volume) * (occupiedPeriod / 60 + (Math.exp(-1 * IVRR * occupiedPeriod / 60) - 1) / IVRR)
+        const iRisk = (1 - Math.exp(-1 * BR * IntQuanta * (1 - maskSus / 100))) * 100
+        const infected = iRisk / 100 * Final_Susceptible
+        const reproduction = infected / Infector
+        const aRisk = (1 - (1 - iRisk / 100) ** Final_Susceptible) * 100
+  
+      results.IR.push(iRisk);
+      results.AR.push(aRisk);
+      results.Estimated.push(infected);
+      results.Reproduction.push(reproduction);
+    }
+  
+    return results;
+  };
+
+
+
   const totalCADRR = outdoorAir + 
     (supplyAir - outdoorAir) * filter + 
     (supplyAir - outdoorAir) * (1 - filter) * hvacUV / 100 +
@@ -597,9 +762,114 @@ return quickSelect(br_ps, Math.floor(percentile));
     roomAC * roomACQ + 
     roomTreatment * roomTreatmentQ;
 
-    const standard = ASHRAE
-    
-  const isCompliant = totalCADRR >= standard;
+    const risk = risk_Calculation(typeCi, CiBmin, CiBmax, Cialpha, Cibeta, Cimin, Cimax,
+        typeCv, CVmu, CVsigma, CVmin, CVmax,
+        type111, type222, type333, type444, type555, 
+        resting, standing, light, moderate, heavy, 
+        BR1mu, BR1sigma, BR1min, BR1max, BR2mu, BR2sigma, BR2min, BR2max, 
+        BR3mu, BR3sigma, BR3min, BR3max, BR4mu, BR4sigma, BR4min, BR4max,  
+        BR5mu, BR5sigma, BR5min, BR5max,
+        ACM, type1, type2, type3, type4, type5, type6, 
+        breathing, whispered, voiced, coughing, whispering, speaking, 
+        EA1mu, EA1sigma, EA1min, EA1max, DD1mu, DD1sigma, DD1min, DD1max,
+        EA2mu, EA2sigma, EA2min, EA2max, DD2mu, DD2sigma, DD2min, DD2max,
+        EA3mu, EA3sigma, EA3min, EA3max, DD3mu, DD3sigma, DD3min, DD3max,
+        EA4mu, EA4sigma, EA4min, EA4max, DD4mu, DD4sigma, DD4min, DD4max,
+        EA5mu, EA5sigma, EA5min, EA5max, DD5mu, DD5sigma, DD5min, DD5max,
+        EA6mu, EA6sigma, EA6min, EA6max, DD6mu, DD6sigma, DD6min, DD6max,
+        EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
+        EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
+        EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4,
+        maskInfector, maskSus,
+        infectorStatus, infectorNumber, occupantNumber, casesPerDay, infectiousPeriod, unreportedCases,
+        floorArea, height, occupiedPeriod, immunityProportion,
+        outdoorAir, supplyAir, filter, hvacUV, hvacTreatment, roomUV, roomUVQ, roomAC, roomACQ, roomTreatment, roomTreatmentQ,
+        typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma
+      ).IR.sort((a, b) => a - b)[Math.floor(percentile * 100)];
+
+      const risk2 = risk_Calculation(typeCi, CiBmin, CiBmax, Cialpha, Cibeta, Cimin, Cimax,
+        typeCv, CVmu, CVsigma, CVmin, CVmax,
+        type111, type222, type333, type444, type555, 
+        resting, standing, light, moderate, heavy, 
+        BR1mu, BR1sigma, BR1min, BR1max, BR2mu, BR2sigma, BR2min, BR2max, 
+        BR3mu, BR3sigma, BR3min, BR3max, BR4mu, BR4sigma, BR4min, BR4max,  
+        BR5mu, BR5sigma, BR5min, BR5max,
+        ACM, type1, type2, type3, type4, type5, type6, 
+        breathing, whispered, voiced, coughing, whispering, speaking, 
+        EA1mu, EA1sigma, EA1min, EA1max, DD1mu, DD1sigma, DD1min, DD1max,
+        EA2mu, EA2sigma, EA2min, EA2max, DD2mu, DD2sigma, DD2min, DD2max,
+        EA3mu, EA3sigma, EA3min, EA3max, DD3mu, DD3sigma, DD3min, DD3max,
+        EA4mu, EA4sigma, EA4min, EA4max, DD4mu, DD4sigma, DD4min, DD4max,
+        EA5mu, EA5sigma, EA5min, EA5max, DD5mu, DD5sigma, DD5min, DD5max,
+        EA6mu, EA6sigma, EA6min, EA6max, DD6mu, DD6sigma, DD6min, DD6max,
+        EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
+        EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
+        EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4,
+        maskInfector, maskSus,
+        infectorStatus, infectorNumber, occupantNumber, casesPerDay, infectiousPeriod, unreportedCases,
+        floorArea, height, occupiedPeriod, immunityProportion,
+        outdoorAir, supplyAir, filter, hvacUV, hvacTreatment, roomUV, roomUVQ, roomAC, roomACQ, roomTreatment, roomTreatmentQ,
+        typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma
+      ).AR.sort((a, b) => a - b)[Math.floor(percentile * 100)];
+
+
+      const risk3 = risk_Calculation(typeCi, CiBmin, CiBmax, Cialpha, Cibeta, Cimin, Cimax,
+        typeCv, CVmu, CVsigma, CVmin, CVmax,
+        type111, type222, type333, type444, type555, 
+        resting, standing, light, moderate, heavy, 
+        BR1mu, BR1sigma, BR1min, BR1max, BR2mu, BR2sigma, BR2min, BR2max, 
+        BR3mu, BR3sigma, BR3min, BR3max, BR4mu, BR4sigma, BR4min, BR4max,  
+        BR5mu, BR5sigma, BR5min, BR5max,
+        ACM, type1, type2, type3, type4, type5, type6, 
+        breathing, whispered, voiced, coughing, whispering, speaking, 
+        EA1mu, EA1sigma, EA1min, EA1max, DD1mu, DD1sigma, DD1min, DD1max,
+        EA2mu, EA2sigma, EA2min, EA2max, DD2mu, DD2sigma, DD2min, DD2max,
+        EA3mu, EA3sigma, EA3min, EA3max, DD3mu, DD3sigma, DD3min, DD3max,
+        EA4mu, EA4sigma, EA4min, EA4max, DD4mu, DD4sigma, DD4min, DD4max,
+        EA5mu, EA5sigma, EA5min, EA5max, DD5mu, DD5sigma, DD5min, DD5max,
+        EA6mu, EA6sigma, EA6min, EA6max, DD6mu, DD6sigma, DD6min, DD6max,
+        EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
+        EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
+        EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4,
+        maskInfector, maskSus,
+        infectorStatus, infectorNumber, occupantNumber, casesPerDay, infectiousPeriod, unreportedCases,
+        floorArea, height, occupiedPeriod, immunityProportion,
+        outdoorAir, supplyAir, filter, hvacUV, hvacTreatment, roomUV, roomUVQ, roomAC, roomACQ, roomTreatment, roomTreatmentQ,
+        typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma
+      ).Estimated.sort((a, b) => a - b)[Math.floor(percentile * 100)];
+
+      const risk4 = risk_Calculation(typeCi, CiBmin, CiBmax, Cialpha, Cibeta, Cimin, Cimax,
+        typeCv, CVmu, CVsigma, CVmin, CVmax,
+        type111, type222, type333, type444, type555, 
+        resting, standing, light, moderate, heavy, 
+        BR1mu, BR1sigma, BR1min, BR1max, BR2mu, BR2sigma, BR2min, BR2max, 
+        BR3mu, BR3sigma, BR3min, BR3max, BR4mu, BR4sigma, BR4min, BR4max,  
+        BR5mu, BR5sigma, BR5min, BR5max,
+        ACM, type1, type2, type3, type4, type5, type6, 
+        breathing, whispered, voiced, coughing, whispering, speaking, 
+        EA1mu, EA1sigma, EA1min, EA1max, DD1mu, DD1sigma, DD1min, DD1max,
+        EA2mu, EA2sigma, EA2min, EA2max, DD2mu, DD2sigma, DD2min, DD2max,
+        EA3mu, EA3sigma, EA3min, EA3max, DD3mu, DD3sigma, DD3min, DD3max,
+        EA4mu, EA4sigma, EA4min, EA4max, DD4mu, DD4sigma, DD4min, DD4max,
+        EA5mu, EA5sigma, EA5min, EA5max, DD5mu, DD5sigma, DD5min, DD5max,
+        EA6mu, EA6sigma, EA6min, EA6max, DD6mu, DD6sigma, DD6min, DD6max,
+        EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
+        EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
+        EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4,
+        maskInfector, maskSus, 
+        infectorStatus, infectorNumber, occupantNumber, casesPerDay, infectiousPeriod, unreportedCases,
+        floorArea, height, occupiedPeriod, immunityProportion,
+        outdoorAir, supplyAir, filter, hvacUV, hvacTreatment, roomUV, roomUVQ, roomAC, roomACQ, roomTreatment, roomTreatmentQ,
+        typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma
+      ).Reproduction.sort((a, b) => a - b)[Math.floor(percentile * 100)];
+
+      const risk_final = targetType === "Individual Risk (%)" ? risk : 
+      targetType === "Absolute Risk (%)" ? risk2 : 
+      targetType === "Estimated Infected People" ? risk3 : 
+      risk4;  // optional: you can set a default value if neither condition matches
+
+
+  const standard = ASHRAE;
 
   const data = () =>
   new Array(yLabels.length).fill(0).map((_, y) =>
@@ -620,14 +890,14 @@ return quickSelect(br_ps, Math.floor(percentile));
         (supplyAir - xValue) * (1 - yValue / 100) * hvacUV / 100 +
         hvacTreatment +
         roomUV * roomUVQ + 
-    roomAC * roomACQ + 
-    roomTreatment * roomTreatmentQ ;
+        roomAC * roomACQ + 
+        roomTreatment * roomTreatmentQ ;
 
       return baseNADR;
     })
   );
 
-     const IR = () => {
+  const IR = () => {
     const nadrValue = nadr().sort((a, b) => a - b)[Math.floor(percentile * 10)];
     const emissionValue = emission().sort((a, b) => a - b)[Math.floor(percentile * 10 )];
     const br_pValue = br_p();
@@ -684,9 +954,68 @@ const AR = () => {
   });
 };
 
+const Estimated = () => {
+    const nadrValue = nadr().sort((a, b) => a - b)[Math.floor(percentile * 10)];
+    const emissionValue = emission().sort((a, b) => a - b)[Math.floor(percentile * 10)];
+    const br_pValue = br_p();
+    const final_susValue = final_sus();
+  
+    // Constants
+    const volume = floorArea * height * 0.02831685;
+  
+    return new Array(yLabels.length).fill(0).map((_, y) => {
+      return new Array(xLabels.length).fill(0).map((_, x) => {
+        const xValue = x * max;
+        const yValue = y * 5;
+        const filterY = yValue / 100;
+  
+        const IVRR = nadrValue + (xValue + 
+          (supplyAir - xValue) * filterY + 
+          (supplyAir - xValue) * (1 - filterY) * hvacUV / 100) * 1.69901082 / volume;
+  
+        const IntQuanta = emissionValue / (IVRR * volume) * (occupiedPeriod / 60 + (Math.exp(-1 * IVRR * occupiedPeriod / 60) - 1) / IVRR);
+        const iRisk = (1 - Math.exp(-1 * br_pValue * IntQuanta * (1 - maskSus / 100))) * 100;
+        const aRisk = (1 - (1 - iRisk / 100) ** final_susValue) * 100;
+        const infected = iRisk / 100 * final_susValue;
+  
+        return infected; // Return the selectedNadrValue for each iteration
+      });
+    });
+  };
+
+  const Reproduction = () => {
+    const nadrValue = nadr().sort((a, b) => a - b)[Math.floor(percentile * 10)];
+    const emissionValue = emission().sort((a, b) => a - b)[Math.floor(percentile * 10)];
+    const br_pValue = br_p();
+    const final_susValue = final_sus();
+    const infectorValue = infector();
+  
+    // Constants
+    const volume = floorArea * height * 0.02831685;
+  
+    return new Array(yLabels.length).fill(0).map((_, y) => {
+      return new Array(xLabels.length).fill(0).map((_, x) => {
+        const xValue = x * max;
+        const yValue = y * 5;
+        const filterY = yValue / 100;
+  
+        const IVRR = nadrValue + (xValue + 
+          (supplyAir - xValue) * filterY + 
+          (supplyAir - xValue) * (1 - filterY) * hvacUV / 100) * 1.69901082 / volume;
+  
+        const IntQuanta = emissionValue / (IVRR * volume) * (occupiedPeriod / 60 + (Math.exp(-1 * IVRR * occupiedPeriod / 60) - 1) / IVRR);
+        const iRisk = (1 - Math.exp(-1 * br_pValue * IntQuanta * (1 - maskSus / 100))) * 100;
+        const aRisk = (1 - (1 - iRisk / 100) ** final_susValue) * 100;
+        const infected = iRisk / 100 * final_susValue;
+        const reproduction = infected / infectorValue
+  
+        return reproduction; // Return the selectedNadrValue for each iteration
+      });
+    });
+  };
+
 const defaultOA = outdoorAir;
 const defaultFilter = filter * 100;
-const thresholdValue = standard * occupantNumber;
 const outdoorAirValue = outdoorAir;
 const filterValue = filter;
 const defaultNADR = outdoorAir + 
@@ -696,12 +1025,14 @@ hvacTreatment +
 roomUV * roomUVQ + 
 roomAC * roomACQ + 
 roomTreatment * roomTreatmentQ;
-        
+
 const [hoveredNADR, setHoveredNADR] = useState(defaultNADR.toFixed(1));
 const [hoveredOA, setHoveredOA] = useState(defaultOA.toFixed(1));
 const [hoveredFilter, setHoveredFilter] = useState(defaultFilter);
 const [hoveredIR, setHoveredIR] = useState(IR()[0][0].toFixed(1));
 const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
+const [hoveredEstimated, setHoveredEstimated] = useState(Estimated()[0][0].toFixed(1));
+const [hoveredReproduction, setHoveredReproduction] = useState(Reproduction()[0][0].toFixed(1));
 
   useEffect(() => {
 
@@ -754,63 +1085,94 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
     EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
     EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
     EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4,
-    typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma, percentile
+    typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma, percentile,
+    target, target2, target3, target4, target5, target6, target7, target8, targetType
+
     );
     
     if (d3Container.current) {
       d3.select(d3Container.current).selectAll('*').remove();
       const svg = d3.select(d3Container.current).append('svg').attr('width', 550).attr('height', 550);
 
-      const maxValue = Math.max(...data2().flat());
-
-      const LANCET_ach = totalCADRR/(floorArea * height) * 60;
 
 
       const colorFunction = (x, y) => {
-        const baseValue = data2()[y][x] / (floorArea * height) * 60;
+
+        const newF1 = targetType === "Individual Risk (%)" ? target : 
+        targetType === "Absolute Risk (%)" ? target3 : 
+        targetType === "Estimated Infected People" ? target5 : 
+        target7;  // optional: you can set a default value if neither condition matches
+
+        const newF2 = targetType === "Individual Risk (%)" ? target2 : 
+        targetType === "Absolute Risk (%)" ? target4: 
+        targetType === "Estimated Infected People" ? target6 : 
+        target8;  // optional: you can set a default value if neither condition matches
+
+        const baseValue = targetType === "Individual Risk (%)" ? IR()[y][x] : 
+        targetType === "Absolute Risk (%)" ? AR()[y][x] : 
+        targetType === "Estimated Infected People" ? Estimated()[y][x] : 
+        Reproduction()[y][x];  // optional: you can set a default value if neither condition matches
     
         const greyColor = '#C8C8C8';
-    
-        const scale = d3.scaleLinear().domain([thresholdValue, maxValue]).range([0.3, 1]);
-        const color = d3.interpolateBlues(scale(baseValue));
-        
 
-        if (baseValue < 4) {
+        if (baseValue < newF1) {
           if (x == (Math.round(outdoorAirValue / max)) &&
           y == (Math.round(filterValue * 100 / 5))) {
 
-            if (LANCET_ach >= 4) {
-              return 'rgba(255, 215, 0, 0.7)'
-            }
-            else {
-          return '#B22222'
-            };
+          return 'lightgray'
+
 
         } else {
    
-          return greyColor;         
+          return 'rgba(20, 86, 139, 0.8)';         
         }
 
-        } else if (baseValue >= 4 && baseValue < 6) {
+        } else if (baseValue >= newF1 && baseValue < newF2) {
             if (x == (Math.round(outdoorAirValue / max)) &&
             y == (Math.round(filterValue * 100 / 5))) {
-              if (LANCET_ach >= 4) {
 
-                return '#006400'
-              }
-              else {
-            return 'rgba(255, 215, 0, 0.7)'
-              };
+                return 'gray'
 
         } else {
 
           
-          return 'rgba(100, 150, 190)';         
+          return 'rgba(255, 215, 0, 0.7)';         
         }
-        } else if (baseValue == 6) {
+
+      } else if (baseValue >= newF2) {
+        if (x == (Math.round(outdoorAirValue / max)) &&
+        y == (Math.round(filterValue * 100 / 5))) {
+
+            return 'gray'
+
+    } else {
+
+      return 'rgba(242, 99, 91, 0.9)';         
+    }
+
+    }
+    };
+{/*
+    if (baseValue < newF1) {
+        if (x == (Math.round(outdoorAirValue / max)) &&
+        y == (Math.round(filterValue * 100 / 5))) {
+
+          if (risk_final >= newF1) {
+            return 'rgba(255, 215, 0, 0.7)'
+          }
+          else {
+        return '#B22222'
+          };
+
+      } else {
+ 
+        return greyColor;         
+      }
+
+      } else if (baseValue >= newF1 && baseValue < newF2) {
           if (x == (Math.round(outdoorAirValue / max)) &&
           y == (Math.round(filterValue * 100 / 5))) {
-            if (LANCET_ach >= 4) {
+            if (risk_final >= newF1) {
 
               return '#006400'
             }
@@ -821,27 +1183,28 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
       } else {
 
         
-        return 'rgba(60, 115, 175)';         
+        return 'rgba(100, 150, 190)';         
       }
-      } else if (baseValue > 6) {
-        if (x == (Math.round(outdoorAirValue / max)) &&
-        y == (Math.round(filterValue * 100 / 5))) {
-          if (LANCET_ach >= 4) {
 
-            return '#006400'
-          }
-          else {
-        return 'rgba(255, 215, 0, 0.7)'
-          };
+    } else if (baseValue >= newF2) {
+      if (x == (Math.round(outdoorAirValue / max)) &&
+      y == (Math.round(filterValue * 100 / 5))) {
+        if (risk_final >= newF1) {
 
-    } else {
+          return '#006400'
+        }
+        else {
+      return 'rgba(255, 215, 0, 0.7)'
+        };
 
-      
-      return 'rgba(60, 115, 175)';         
-    }
-    }
-    };
+  } else {
 
+    
+    return 'rgba(60, 115, 175)';         
+  }
+  }
+  };
+*/}
 
       const xScale = d3.scaleBand().domain(xLabels).range([50, 500]);
       const yScale = d3.scaleBand().domain(yLabels).range([500, 50]);
@@ -917,6 +1280,8 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
           const yValue = yLabels[y];
           const value2 = IR()[y][x].toFixed(1);
           const value3 = AR()[y][x].toFixed(1);
+          const value4 = Estimated()[y][x].toFixed(1);
+          const value5 = Reproduction()[y][x].toFixed(1);
           d3.select(this).style('opacity', 0.5);
       
           setHoveredNADR(value);
@@ -924,6 +1289,8 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
           setHoveredFilter(yValue);
           setHoveredIR(value2);
           setHoveredAR(value3);
+          setHoveredEstimated(value4);
+          setHoveredReproduction(value5);
         })
 
         .on('mouseout', (event, d) => {
@@ -969,7 +1336,8 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
     EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
     EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
     EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4,
-    typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma, percentile ]);
+    typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma, percentile,
+   target, target2, target3, target4, target5, target6, target7, target8, targetType ]);
 
   return (
 
@@ -996,63 +1364,12 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
           fontSize: '0.9rem',
         }}
       >
-        Total NADR {hoveredNADR} cfm&emsp;Individual Risk: {hoveredIR}%&emsp;Absolute Risk: {hoveredAR}%<br/> OA: {hoveredOA} cfm&emsp;RA: {supplyAir-hoveredOA} cfm ({((supplyAir - hoveredOA) / supplyAir * 100).toFixed(1)}%)&emsp;Filter: {hoveredFilter}%
+                Total CADR {hoveredNADR} cfm&emsp;Individual Risk: {hoveredIR}%&emsp;Absolute Risk: {hoveredAR}%
+                <br/> Estimated Infected People: {hoveredEstimated}&emsp;Reproduction Number: {hoveredReproduction}
+                <br/> OA: {hoveredOA} cfm&emsp;RA: {supplyAir-hoveredOA} cfm ({((supplyAir - hoveredOA) / supplyAir * 100).toFixed(1)}%)&emsp;Filter: {hoveredFilter}%
         </span>
         <br/>
         
-{/*
-
-        <button
-        className='fancy-button4'
-        style={{ fontSize: '14px', padding: '0 15px', height: '32px' }}
-        onClick={() => setShowControl(!showControl)}
-      >
-        {showControl ? 'Hide Controller' : 'Show Controller'}
-      </button>
-
-
-      {showControl && ( 
-        <div>
-      <span
-      style={{
-        marginLeft: '20px',
-        fontFamily: 'Arial',
-        fontSize: '0.9rem',
-      }}
-    >
-        [ HVAC ]&emsp;UVC Inactivation: {hvacUV}%&emsp;Air Treatment: {hvacTreatment} cfm
-        <br/>
-        <span style={{ lineHeight: '1.7' }}>&nbsp;</span>
-         <label style={{ fontFamily: 'Arial', fontSize: '0.9rem', marginRight: '10px' }}>
-        [ In Room ]&emsp;Air Cleaner
-      </label>
-      <input
-        type="checkbox"
-        checked={ac}
-        onChange={(e) => setAc(e.target.checked)}
-      />
-&emsp;
-      <label style={{ fontFamily: 'Arial', fontSize: '0.9rem', marginRight: '10px' }}>
-        UVC
-      </label>
-      <input
-        type="checkbox"
-        checked={uvc}
-        onChange={(e) => setUvc(e.target.checked)}
-      />
-&emsp;
-      <label style={{ fontFamily: 'Arial', fontSize: '0.9rem', marginRight: '10px' }}>
-        Air Treatent
-      </label>
-      <input
-        type="checkbox"
-        checked={air}
-        onChange={(e) => setAir(e.target.checked)}
-      />
-      </span>
-      </div>
-      )}
-      */}
 
     </>
   )}
@@ -1063,4 +1380,4 @@ const [hoveredAR, setHoveredAR] = useState(AR()[0][0].toFixed(1));
 );
 };
 
-export default LANCET1cfm;
+export default Target1cfm;

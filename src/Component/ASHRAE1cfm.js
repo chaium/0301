@@ -415,7 +415,18 @@ function partition(nums, left, right, pivotIndex) {
 }
 
 
-const nadr = () => {
+const createCachedFunction = (fn) => {
+  let cached;
+  return () => {
+      if (cached === undefined) {
+          cached = fn();
+      }
+      return cached;
+  };
+};
+
+
+const nadr = createCachedFunction(() => {
   let naturals = [];
   const simulations = 1000;
 
@@ -425,9 +436,9 @@ const nadr = () => {
   }
 
   return naturals; // Return the array of simulations directly.
-};
+});
 
-const emission = () => {
+const emission = createCachedFunction(() => {
 let emissions = [];
 
 const simulations = 1000;
@@ -489,10 +500,10 @@ for (let i = 0; i < simulations; i++) {
 }
 
 return emissions;
-}
+})
 
 
-const final_sus = () => {
+const final_sus = createCachedFunction(() => {
 let results = [];
 
 const simulations = 1000;
@@ -553,9 +564,9 @@ for (let i = 0; i < simulations; i++) {
 }
 
 return quickSelect(results, Math.floor(percentile));
-}
+})
 
-const br_p = () => {
+const br_p = createCachedFunction(() => {
 let br_ps = [];
 
 const simulations = 1000;
@@ -575,7 +586,7 @@ for (let i = 0; i < simulations; i++) {
 }
 
 return quickSelect(br_ps, Math.floor(percentile));
-}
+})
 
 
   const totalCADRR = outdoorAir + 
