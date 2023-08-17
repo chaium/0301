@@ -79,10 +79,10 @@ const Hero = ({saveForComparison}) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showDistance, setShowDistance] = useState(true)
   const [distance, setDistance] = useState(6)
-  const [showTarget, setShowTarget] = useState(true)
+  const [showTarget, setShowTarget] = useState(false)
   const [targetType, setTargetType] = useState("Individual Risk (%)")
   const [target, setTarget] = useState(0.1)
-  const [target2, setTarget2] = useState(0.3)
+  const [target2, setTarget2] = useState(0.3) 
   const [target3, setTarget3] = useState(1)
   const [target4, setTarget4] = useState(3)
   const [target5, setTarget5] = useState(0.1)
@@ -820,18 +820,6 @@ function partition(nums, left, right, pivotIndex) {
   return storeIndex;
 }
 
-
-const nadr = () => {
-  let naturals = [];
-  const simulations = 1000;
-
-  for (let i = 0; i < simulations; i++) {
-    const nat = natural_calculation(typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma);
-    naturals.push(nat);
-  }
-
-  return naturals; // Return the array of simulations directly.
-};
 
 const emission = () => {
 let emissions = [];
@@ -9970,7 +9958,6 @@ const getLancetText3 = (totalCADR) => {
   }
 }
 
-const nadrValue = nadr().sort((a, b) => a - b)[Math.floor(percentile * 10)];
 const emissionValue = emission().sort((a, b) => a - b)[Math.floor(percentile * 10 )];
 const br_pValue = br_p();
 const final_susValue = final_sus();

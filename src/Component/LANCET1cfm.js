@@ -432,7 +432,11 @@ const nadr = createCachedFunction(() => {
   const simulations = 1000;
 
   for (let i = 0; i < simulations; i++) {
-    const nat = natural_calculation(typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma);
+    const nat = natural_calculation(typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma) + 
+    hvacTreatment + 
+    roomUV * roomUVQ + 
+    roomAC * roomACQ + 
+    roomTreatment * roomTreatmentQ;
     naturals.push(nat);
   }
 
