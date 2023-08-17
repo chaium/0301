@@ -762,112 +762,6 @@ function risk_Calculation(typeCi, CiBmin, CiBmax, Cialpha, Cibeta, Cimin, Cimax,
     roomAC * roomACQ + 
     roomTreatment * roomTreatmentQ;
 
-    const risk = risk_Calculation(typeCi, CiBmin, CiBmax, Cialpha, Cibeta, Cimin, Cimax,
-        typeCv, CVmu, CVsigma, CVmin, CVmax,
-        type111, type222, type333, type444, type555, 
-        resting, standing, light, moderate, heavy, 
-        BR1mu, BR1sigma, BR1min, BR1max, BR2mu, BR2sigma, BR2min, BR2max, 
-        BR3mu, BR3sigma, BR3min, BR3max, BR4mu, BR4sigma, BR4min, BR4max,  
-        BR5mu, BR5sigma, BR5min, BR5max,
-        ACM, type1, type2, type3, type4, type5, type6, 
-        breathing, whispered, voiced, coughing, whispering, speaking, 
-        EA1mu, EA1sigma, EA1min, EA1max, DD1mu, DD1sigma, DD1min, DD1max,
-        EA2mu, EA2sigma, EA2min, EA2max, DD2mu, DD2sigma, DD2min, DD2max,
-        EA3mu, EA3sigma, EA3min, EA3max, DD3mu, DD3sigma, DD3min, DD3max,
-        EA4mu, EA4sigma, EA4min, EA4max, DD4mu, DD4sigma, DD4min, DD4max,
-        EA5mu, EA5sigma, EA5min, EA5max, DD5mu, DD5sigma, DD5min, DD5max,
-        EA6mu, EA6sigma, EA6min, EA6max, DD6mu, DD6sigma, DD6min, DD6max,
-        EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
-        EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
-        EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4,
-        maskInfector, maskSus,
-        infectorStatus, infectorNumber, occupantNumber, casesPerDay, infectiousPeriod, unreportedCases,
-        floorArea, height, occupiedPeriod, immunityProportion,
-        outdoorAir, supplyAir, filter, hvacUV, hvacTreatment, roomUV, roomUVQ, roomAC, roomACQ, roomTreatment, roomTreatmentQ,
-        typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma
-      ).IR.sort((a, b) => a - b)[Math.floor(percentile * 100)];
-
-      const risk2 = risk_Calculation(typeCi, CiBmin, CiBmax, Cialpha, Cibeta, Cimin, Cimax,
-        typeCv, CVmu, CVsigma, CVmin, CVmax,
-        type111, type222, type333, type444, type555, 
-        resting, standing, light, moderate, heavy, 
-        BR1mu, BR1sigma, BR1min, BR1max, BR2mu, BR2sigma, BR2min, BR2max, 
-        BR3mu, BR3sigma, BR3min, BR3max, BR4mu, BR4sigma, BR4min, BR4max,  
-        BR5mu, BR5sigma, BR5min, BR5max,
-        ACM, type1, type2, type3, type4, type5, type6, 
-        breathing, whispered, voiced, coughing, whispering, speaking, 
-        EA1mu, EA1sigma, EA1min, EA1max, DD1mu, DD1sigma, DD1min, DD1max,
-        EA2mu, EA2sigma, EA2min, EA2max, DD2mu, DD2sigma, DD2min, DD2max,
-        EA3mu, EA3sigma, EA3min, EA3max, DD3mu, DD3sigma, DD3min, DD3max,
-        EA4mu, EA4sigma, EA4min, EA4max, DD4mu, DD4sigma, DD4min, DD4max,
-        EA5mu, EA5sigma, EA5min, EA5max, DD5mu, DD5sigma, DD5min, DD5max,
-        EA6mu, EA6sigma, EA6min, EA6max, DD6mu, DD6sigma, DD6min, DD6max,
-        EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
-        EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
-        EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4,
-        maskInfector, maskSus,
-        infectorStatus, infectorNumber, occupantNumber, casesPerDay, infectiousPeriod, unreportedCases,
-        floorArea, height, occupiedPeriod, immunityProportion,
-        outdoorAir, supplyAir, filter, hvacUV, hvacTreatment, roomUV, roomUVQ, roomAC, roomACQ, roomTreatment, roomTreatmentQ,
-        typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma
-      ).AR.sort((a, b) => a - b)[Math.floor(percentile * 100)];
-
-
-      const risk3 = risk_Calculation(typeCi, CiBmin, CiBmax, Cialpha, Cibeta, Cimin, Cimax,
-        typeCv, CVmu, CVsigma, CVmin, CVmax,
-        type111, type222, type333, type444, type555, 
-        resting, standing, light, moderate, heavy, 
-        BR1mu, BR1sigma, BR1min, BR1max, BR2mu, BR2sigma, BR2min, BR2max, 
-        BR3mu, BR3sigma, BR3min, BR3max, BR4mu, BR4sigma, BR4min, BR4max,  
-        BR5mu, BR5sigma, BR5min, BR5max,
-        ACM, type1, type2, type3, type4, type5, type6, 
-        breathing, whispered, voiced, coughing, whispering, speaking, 
-        EA1mu, EA1sigma, EA1min, EA1max, DD1mu, DD1sigma, DD1min, DD1max,
-        EA2mu, EA2sigma, EA2min, EA2max, DD2mu, DD2sigma, DD2min, DD2max,
-        EA3mu, EA3sigma, EA3min, EA3max, DD3mu, DD3sigma, DD3min, DD3max,
-        EA4mu, EA4sigma, EA4min, EA4max, DD4mu, DD4sigma, DD4min, DD4max,
-        EA5mu, EA5sigma, EA5min, EA5max, DD5mu, DD5sigma, DD5min, DD5max,
-        EA6mu, EA6sigma, EA6min, EA6max, DD6mu, DD6sigma, DD6min, DD6max,
-        EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
-        EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
-        EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4,
-        maskInfector, maskSus,
-        infectorStatus, infectorNumber, occupantNumber, casesPerDay, infectiousPeriod, unreportedCases,
-        floorArea, height, occupiedPeriod, immunityProportion,
-        outdoorAir, supplyAir, filter, hvacUV, hvacTreatment, roomUV, roomUVQ, roomAC, roomACQ, roomTreatment, roomTreatmentQ,
-        typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma
-      ).Estimated.sort((a, b) => a - b)[Math.floor(percentile * 100)];
-
-      const risk4 = risk_Calculation(typeCi, CiBmin, CiBmax, Cialpha, Cibeta, Cimin, Cimax,
-        typeCv, CVmu, CVsigma, CVmin, CVmax,
-        type111, type222, type333, type444, type555, 
-        resting, standing, light, moderate, heavy, 
-        BR1mu, BR1sigma, BR1min, BR1max, BR2mu, BR2sigma, BR2min, BR2max, 
-        BR3mu, BR3sigma, BR3min, BR3max, BR4mu, BR4sigma, BR4min, BR4max,  
-        BR5mu, BR5sigma, BR5min, BR5max,
-        ACM, type1, type2, type3, type4, type5, type6, 
-        breathing, whispered, voiced, coughing, whispering, speaking, 
-        EA1mu, EA1sigma, EA1min, EA1max, DD1mu, DD1sigma, DD1min, DD1max,
-        EA2mu, EA2sigma, EA2min, EA2max, DD2mu, DD2sigma, DD2min, DD2max,
-        EA3mu, EA3sigma, EA3min, EA3max, DD3mu, DD3sigma, DD3min, DD3max,
-        EA4mu, EA4sigma, EA4min, EA4max, DD4mu, DD4sigma, DD4min, DD4max,
-        EA5mu, EA5sigma, EA5min, EA5max, DD5mu, DD5sigma, DD5min, DD5max,
-        EA6mu, EA6sigma, EA6min, EA6max, DD6mu, DD6sigma, DD6min, DD6max,
-        EA1_1, EA1_2, EA1_3, EA1_4, EA2_1, EA2_2, EA2_3, EA2_4,
-        EA3_1, EA3_2, EA3_3, EA3_4, EA4_1, EA4_2, EA4_3, EA4_4,
-        EA5_1, EA5_2, EA5_3, EA5_4, EA6_1, EA6_2, EA6_3, EA6_4,
-        maskInfector, maskSus, 
-        infectorStatus, infectorNumber, occupantNumber, casesPerDay, infectiousPeriod, unreportedCases,
-        floorArea, height, occupiedPeriod, immunityProportion,
-        outdoorAir, supplyAir, filter, hvacUV, hvacTreatment, roomUV, roomUVQ, roomAC, roomACQ, roomTreatment, roomTreatmentQ,
-        typeInact, infilmin, infilmax, dmin, dmax, inactmin, inactmax, inactmu, inactsigma
-      ).Reproduction.sort((a, b) => a - b)[Math.floor(percentile * 100)];
-
-      const risk_final = targetType === "Individual Risk (%)" ? risk : 
-      targetType === "Absolute Risk (%)" ? risk2 : 
-      targetType === "Estimated Infected People" ? risk3 : 
-      risk4;  // optional: you can set a default value if neither condition matches
-
 
   const standard = ASHRAE;
 
@@ -1113,7 +1007,6 @@ const [hoveredReproduction, setHoveredReproduction] = useState(Reproduction()[0]
         targetType === "Estimated Infected People" ? Estimated()[y][x] : 
         Reproduction()[y][x];  // optional: you can set a default value if neither condition matches
     
-        const greyColor = '#C8C8C8';
 
         if (baseValue < newF1) {
           if (x == (Math.round(outdoorAirValue / max)) &&
@@ -1152,59 +1045,6 @@ const [hoveredReproduction, setHoveredReproduction] = useState(Reproduction()[0]
 
     }
     };
-{/*
-    if (baseValue < newF1) {
-        if (x == (Math.round(outdoorAirValue / max)) &&
-        y == (Math.round(filterValue * 100 / 5))) {
-
-          if (risk_final >= newF1) {
-            return 'rgba(255, 215, 0, 0.7)'
-          }
-          else {
-        return '#B22222'
-          };
-
-      } else {
- 
-        return greyColor;         
-      }
-
-      } else if (baseValue >= newF1 && baseValue < newF2) {
-          if (x == (Math.round(outdoorAirValue / max)) &&
-          y == (Math.round(filterValue * 100 / 5))) {
-            if (risk_final >= newF1) {
-
-              return '#006400'
-            }
-            else {
-          return 'rgba(255, 215, 0, 0.7)'
-            };
-
-      } else {
-
-        
-        return 'rgba(100, 150, 190)';         
-      }
-
-    } else if (baseValue >= newF2) {
-      if (x == (Math.round(outdoorAirValue / max)) &&
-      y == (Math.round(filterValue * 100 / 5))) {
-        if (risk_final >= newF1) {
-
-          return '#006400'
-        }
-        else {
-      return 'rgba(255, 215, 0, 0.7)'
-        };
-
-  } else {
-
-    
-    return 'rgba(60, 115, 175)';         
-  }
-  }
-  };
-*/}
 
       const xScale = d3.scaleBand().domain(xLabels).range([50, 500]);
       const yScale = d3.scaleBand().domain(yLabels).range([500, 50]);
